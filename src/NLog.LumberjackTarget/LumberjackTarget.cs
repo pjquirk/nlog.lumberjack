@@ -59,11 +59,10 @@ namespace NLog.Targets.Lumberjack
             Array.ForEach(logEvents, e => Write(e));
         }
 
-        Random rnd = new Random();
         private byte[] CreatePacket(LogEventInfo logEvent)
         {
             var data = logEvent.Properties["data"] as LumberjackMessageBase;
-            var dt = DateTime.UtcNow.AddDays(-rnd.Next(0, 7));
+            var dt = DateTime.UtcNow;
             var log = new Dictionary<string, object>
             {
                 { "source", data.Source  },
