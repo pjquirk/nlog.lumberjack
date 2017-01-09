@@ -13,11 +13,13 @@ namespace NLog.Targets.Lumberjack
     {
         private LumberjackProtocol _protocol = new LumberjackProtocol();
         private Transport _transport;
+        private bool _hasSentWindow;
 
         #region parameters
         [RequiredParameter]
         public string Host { get; set; }
         public int Port { get; set; } = 5000;
+        public int AckWindowSize { get; set; } = 50;
         [RequiredParameter]
         public string Thumbprint { get; set; }
         #endregion
@@ -44,12 +46,24 @@ namespace NLog.Targets.Lumberjack
 
         protected override void Write(AsyncLogEventInfo logEvent)
         {
+            SendWindowSizeIfNecessary();
             var packet = CreatePacket(logEvent.LogEvent);
             _transport.Send(packet);
         }
 
+        private void SendWindowSizeIfNecessary()
+        {
+            if (_hasSentWindow)
+                return;
+
+            var packet = _protocol.CreateWindowSizePacket(AckWindowSize);
+            _transport.Send(packet);
+            _hasSentWindow = true;
+        }
+
         protected override void Write(LogEventInfo logEvent)
         {
+            SendWindowSizeIfNecessary();
             var packet = CreatePacket(logEvent);
             _transport.Send(packet);
         }
