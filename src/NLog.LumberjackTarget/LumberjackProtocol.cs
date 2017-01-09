@@ -38,7 +38,7 @@
                 mem.WriteByte(Version1Byte);
                 mem.WriteByte(WindowSizeFrameByte);
 
-                var buff = new byte[8];
+                var buff = new byte[4];
                 buff[0] = (byte)(windowSize >> 24);
                 buff[1] = (byte)(windowSize >> 16);
                 buff[2] = (byte)(windowSize >> 8);
